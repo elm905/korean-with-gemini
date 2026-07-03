@@ -4,17 +4,17 @@ const GRAMMAR_DB = {
   
   // 수행평가 해설지에 수록된 대표적인 예외/품사통용 어휘 데이터베이스
   specialCases: {
-    "있다": { type: "hold", desc: "존재를 나타낼 때는 형용사 양상을 보이지만, '집에 있어라'처럼 명령형/진행형과 쓰일 때는 동사적 성격을 가집니다." },
-    "없다": { type: "adjective", desc: "‘있다’와 달리 활용 양상이 완벽히 형용사 규칙에 수렴합니다." },
-    "크다": { type: "hold", desc: "자라나는 과정(동사, 예: 나무가 크다)인지, 이미 자란 상태(형용사, 예: 키가 크다)인지 문맥 구별이 요구됩니다." },
-    "늦다": { type: "hold", desc: "약속 시간에 늦는 행위(동사, 예: 늦는다)와 발걸음 속도가 느린 상태(형용사, 예: 발걸음이 늦다)로 모두 활용됩니다." },
-    "굳다": { type: "hold", desc: "액체가 단단하게 변하는 과정은 동사이며, 이미 단단해진 고정 상태를 수식할 때는 문맥 점검이 필요합니다." },
-    "맛있다": { type: "adjective", desc: "‘있다’ 계열이지만 학교문법 규정 및 표준국어대사전상 형용사 고정입니다." },
-    "재미있다": { type: "adjective", desc: "‘있다’ 계열이지만 수행평가 기준 형용사 고정입니다." }
+    "있다": { type: "hold", desc: "존재 유무 상황에서는 형용사적 성격을 띠나, '집에 있어라'와 같이 명령형/진행형 어미와 결합 시 동사적 성격을 공유합니다." },
+    "없다": { type: "adjective", desc: "‘있다’와 달리 전형적인 형용사 어미 활용 구조에 고정됩니다." },
+    "크다": { type: "hold", desc: "'-ㄴ다'가 결합해 '큰다(동사 활용)'가 되는지, 혹은 현재 형태 고정형(형용사 활용)인지 문맥 분별이 요구되는 통용어입니다." },
+    "늦다": { type: "hold", desc: "선어말어미와 만나 '늦는다(동사 활용)'로 쓰이거나, 형태 고정형(형용사 활용)으로 모두 구현되는 대표 통용어입니다." },
+    "굳다": { type: "hold", desc: "어미와 조립되어 '굳는다(동사 변화 과정)'로 성립하는 경우와 고정 수식 상태를 구분해야 하는 어휘입니다." },
+    "맛있다": { type: "adjective", desc: "‘있다’ 결합형이지만 학교문법 규정상 형용사 활용 패러다임으로 규정되어 있습니다." },
+    "재미있다": { type: "adjective", desc: "학교문법 교수 학습 기준에 따라 형용사 고정 활용어로 처리합니다." }
   }
 };
 
-// DOM 객체 바인딩 (불필요한 구버전 전역변수 완전 배제)
+// DOM 객체 바인딩
 const wordInput = document.querySelector("#wordInput");
 const buildButton = document.querySelector("#buildButton");
 const resetButton = document.querySelector("#resetButton");
@@ -37,7 +37,7 @@ function hasFinalConsonant(text) {
 }
 
 /**
- * [수행평가 5대 기준] 활용형 분석 처리 알고리즘
+ * [수행평가 5대 기준] 기본형을 활용형으로 직접 변형하여 대조하는 정밀 알고리즘
  */
 function evaluateWordByHwalgyong(word) {
   // [명사/비용언 방어코드] '기본' 등 '~다' 형태가 아닌 단어를 최상단에서 차단
@@ -49,7 +49,7 @@ function evaluateWordByHwalgyong(word) {
         criterion: "형태론적 기본 검사",
         derived: word,
         status: "분석 불가",
-        desc: "동사와 형용사의 기본형은 항상 ‘~다’로 끝나야 합니다. 명사나 다른 품사는 활용형을 판독할 수 없습니다."
+        desc: "동사와 형용사의 기본형은 항상 ‘~다’로 끝나야 합니다. 명사나 다른 품사는 활용형 변형 알고리즘을 적용할 수 없습니다."
       }],
       notice: "‘기본’과 같은 명사 품사는 분석 대상이 아닙니다. ‘~다’로 끝나는 기본형 용언을 정확히 입력해 주세요."
     };
@@ -62,7 +62,7 @@ function evaluateWordByHwalgyong(word) {
   let adjScore = 0;
   const hwalgyongResults = [];
 
-  // 1단계: 수행평가 핵심 고난도 주의 대상 가로채기
+  // 1단계: 수행평가 핵심 고난도 품사 통용어 선처리
   if (GRAMMAR_DB.specialCases[word]) {
     const special = GRAMMAR_DB.specialCases[word];
     return {
@@ -71,7 +71,7 @@ function evaluateWordByHwalgyong(word) {
       adjScore: special.type === "hold" ? 1 : (special.type === "adjective" ? 4 : 0),
       hwalgyongResults: [{
         criterion: "수행평가 빈출 품사 통용어",
-        derived: `[특수 규정] ${word}`,
+        derived: `[특수 활용] ${word}`,
         status: special.type === "hold" ? "품사 통용" : "고정 분류",
         desc: special.desc
       }],
@@ -79,91 +79,90 @@ function evaluateWordByHwalgyong(word) {
     };
   }
 
-  // 접사 형태 특징 사전 필터링 상수
   const isSuffixAdj = GRAMMAR_DB.adjectiveSuffixes.some(s => word.endsWith(s));
 
-  // 2단계: 수행평가 해설지 수록 5대 활용형 규칙 가상 매칭 수행
+  // 2단계: 수행평가 해설지 수록 5대 활용형 규칙 적용 (추상적 뜻풀이 배제)
 
-  // 기준 ①: 현재 시제 선어말어미 (-ㄴ-/-는-) 결합
+  // 기준 ①: 현재 시제 선어말어미 (-ㄴ-/-는-) 변형 검증
   const presentForm = `${stem}${hasBatchim ? "는" : "ㄴ"}다`;
   if (!isSuffixAdj) {
     verbScore += 1;
     hwalgyongResults.push({
-      criterion: "현재 시제 선어말어미 결합",
+      criterion: "현재 시제 선어말어미 변형 결합",
       derived: `‘${presentForm}’`,
-      status: "동사적 활용형",
-      desc: "현재 시제 선어말어미 ‘-ㄴ-/-는-’이 정상적으로 결합하는 성질은 동사 고유의 특징입니다."
+      status: "동사형 성립",
+      desc: "기본형의 어간에 현재 시제 선어말어미 ‘-ㄴ-/-는-’이 조립되어 매끄러운 활용형을 구성하면 동사적 성격입니다."
     });
   } else {
     adjScore += 1;
     hwalgyongResults.push({
-      criterion: "현재 시제 선어말어미 결합",
-      derived: `‘${word}’ (형태 변형 없음)`,
-      status: "형용사적 활용형",
-      desc: "형용사는 별도의 선어말어미 없이 기본형태 그대로 현재 상태를 나타냅니다."
+      criterion: "현재 시제 선어말어미 변형 결합",
+      derived: `‘${word}’ (어미 결합 불가)`,
+      status: "형용사형 성립",
+      desc: "현재 시제 선어말어미가 결합하지 못하고 기본형태 자체로 현재 시제를 나타내는 패턴은 형용사적 성격입니다."
     });
   }
 
-  // 기준 ②: 현재 관형사형 어미 (-는 vs -(으)ㄴ) 결합
+  // 기준 ②: 현재 관형사형 어미 (-는 vs -(으)ㄴ) 변형 검증
   const verbModifier = `${stem}는`;
   const adjModifier = `${stem}${hasBatchim ? "은" : "ㄴ"}`;
   if (!isSuffixAdj) {
     verbScore += 1;
     hwalgyongResults.push({
-      criterion: "현재 관형사형 어미 결합",
-      derived: `‘${verbModifier}’ [예: ${verbModifier} 사람]`,
-      status: "동사형 일치",
-      desc: "현재 시제에서 체언을 수식할 때 관형사형 어미 ‘-는’이 연결되면 동사입니다."
+      criterion: "현재 관형사형 어미 변형 결합",
+      derived: `‘${verbModifier}’`,
+      status: "동사 규격 일치",
+      desc: "어간 뒤에 관형사형 어미 ‘-는’이 결합하여 가상 구조를 조립해낼 수 있으면 동사 유형에 매칭됩니다."
     });
   } else {
     adjScore += 1;
     hwalgyongResults.push({
-      criterion: "현재 관형사형 어미 결합",
-      derived: `‘${adjModifier}’ [예: ${adjModifier} 상태]`,
-      status: "형용사형 일치",
-      desc: "현재 시제 수식 시 관형사형 어미 ‘-(으)ㄴ’ 형태로 결합하는 양상은 형용사의 규칙입니다."
+      criterion: "현재 관형사형 어미 변형 결합",
+      derived: `‘${adjModifier}’`,
+      status: "형용사 규격 일치",
+      desc: "현재 시제 수식 문맥에서 관형사형 어미 ‘-(으)ㄴ’ 형태로 결합 및 활용하는 현상은 형용사의 특징입니다."
     });
   }
 
-  // 기준 ③: 현재 시제 감탄형 어미 (-는구나 vs -구나) 결합
+  // 기준 ③: 현재 시제 감탄형 어미 (-는구나 vs -구나) 변형 검증
   const verbExcl = `${stem}는구나`;
   const adjExcl = `${stem}구나`;
   if (!isSuffixAdj) {
     verbScore += 1;
     hwalgyongResults.push({
-      criterion: "현재 감탄형 어미 결합",
+      criterion: "현재 감탄형 어미 변형 결합",
       derived: `‘${verbExcl}’`,
-      status: "동사 기준 충족",
-      desc: "감탄형 종결어미 ‘-는구나’를 자연스럽게 활용하여 취할 수 있는 것은 동사입니다."
+      status: "동사 조건 충족",
+      desc: "종결 위치에 감탄형 어미 ‘-는구나’의 형태로 변형 조립이 자연스러운 용언은 동사 규칙을 따릅니다."
     });
   } else {
     adjScore += 1;
     hwalgyongResults.push({
-      criterion: "현재 감탄형 어미 결합",
+      criterion: "현재 감탄형 어미 변형 결합",
       derived: `‘${adjExcl}’`,
-      status: "형용사 기준 충족",
-      desc: "어간 뒤에 ‘-구나’가 바로 직접 결합하여 감탄문을 형성하면 형용사입니다."
+      status: "형용사 조건 충족",
+      desc: "어간에 감탄형 어미 ‘-구나’가 원형 그대로 결합하여 활용 패러다임을 형성하면 형용사 규칙을 따릅니다."
     });
   }
 
-  // 기준 ④ & ⑤: 명령형(-어라/-아라) 및 청유형(-자) 어미 수용성
+  // 기준 ④ & ⑤: 명령형(-어라/-아라) 및 청유형(-자) 어미 활용 변형 수용성
   const imperative = `${stem}${hasBatchim ? "어라" : "아라"}`;
   const suggestive = `${stem}자`;
   if (!isSuffixAdj) {
     verbScore += 1;
     hwalgyongResults.push({
-      criterion: "명령형 및 청유형 어미 수용성",
+      criterion: "명령형 및 청유형 어미 활용 수용성",
       derived: `‘${imperative}’, ‘${suggestive}’`,
-      status: "결합 허용",
-      desc: "동작이나 의지를 가질 수 있으므로 명령형 어미와 청유형 어미 ‘-자’의 사용이 완전 허용됩니다."
+      status: "변형 허용",
+      desc: "명령형 표현과 청유형 어미 ‘-자’ 형태로의 활용 변형 구조가 완전하게 지원되는 경우 동사입니다."
     });
   } else {
     adjScore += 1;
     hwalgyongResults.push({
-      criterion: "명령형 및 청유형 어미 수용성",
-      derived: `‘${imperative}’ (문법적 거부)`,
-      status: "결합 제한",
-      desc: "대상의 상태나 성질은 의도적으로 명령하거나 함께 청유할 수 없으므로 원칙적으로 제약을 받습니다."
+      criterion: "명령형 및 청유형 어미 활용 수용성",
+      derived: `‘${imperative}’ (변형 거부)`,
+      status: "변형 제한",
+      desc: "문법 규칙상 명령형 어미나 청유형 형태소 결합 변형에 제약을 받거나 비문이 되는 현상은 형용사입니다."
     });
   }
 
@@ -200,9 +199,9 @@ function renderResult(word, analysis) {
   resultTitle.textContent = `결론: ${labels[analysis.result]}`;
   
   if (analysis.result === "hold") {
-    resultSummary.textContent = `‘${word}’는 활용 어미 변형 구조상 동사/형용사 문맥이 공존하는 단어이거나 판독 불가 대상입니다.`;
+    resultSummary.textContent = `‘${word}’는 변형형 구조 대조 결과 동사/형용사 문맥 활용형이 모두 출현하는 품사통용 단어군입니다.`;
   } else {
-    resultSummary.textContent = `‘${word}’는 수행평가 해설지 이론에 명시된 어미 규칙 대입 스코어에 근거하여 [${labels[analysis.result]}] 품사로 귀결됩니다.`;
+    resultSummary.textContent = `‘${word}’는 수행평가 가상 어미 조합 스코어 점수에 따라 [${labels[analysis.result]}] 활용형 패러다임으로 귀결됩니다.`;
   }
 
   processList.innerHTML = analysis.hwalgyongResults
@@ -216,14 +215,14 @@ function renderResult(word, analysis) {
 
   evidenceTable.innerHTML = `
     <tr>
-      <td>동사 활용형 기준 만족도</td>
+      <td>동사 활용형 변형 스코어</td>
       <td>${analysis.verbScore} / 4 점</td>
-      <td>현재형(-ㄴ다), 관형사형(-는), 감탄형(-는구나), 명령/청유형 수용성</td>
+      <td>현재형(-ㄴ다), 관형사형(-는), 감탄형(-는구나), 명령/청유형 수용 매칭</td>
     </tr>
     <tr>
-      <td>형용사 활용형 기준 만족도</td>
+      <td>형용사 활용형 변형 스코어</td>
       <td>${analysis.adjScore} / 4 점</td>
-      <td>현재형(형태 고정), 관형사형(-(으)ㄴ), 감탄형(-구나), 명령/청유형 제약성</td>
+      <td>현재형(어간 고정), 관형사형(-(으)ㄴ), 감탄형(-구나), 명령/청유형 제약 매칭</td>
     </tr>
   `;
 
