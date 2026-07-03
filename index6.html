@@ -13,14 +13,14 @@
           <p class="eyebrow">2026 언어와 매체 수행평가 기준</p>
           <h1>동사/형용사 활용형 판별기</h1>
           <p class="intro-copy">
-            단어(기본형 또는 문장 속 활용형)를 입력하면, 수행평가 해설지의 5대 핵심 어미 규칙을 적용하여 동사와 형용사를 과학적으로 판별합니다.
+            문장 속 활용형(예: 굳는다, 굳은)이나 기본형을 입력하면, 수행평가 해설지의 어미 결합 및 활용 규칙만을 추적하여 해당 품사를 과학적으로 판별합니다.
           </p>
         </div>
         <div class="quick-examples" aria-label="예시 입력">
-          <button type="button" class="ghost-button" data-example="먹다">먹다</button>
-          <button type="button" class="ghost-button" data-example="늙는다">늙는다</button>
+          <button type="button" class="ghost-button" data-example="굳는다">굳는다</button>
+          <button type="button" class="ghost-button" data-example="굳은">굳은</button>
           <button type="button" class="ghost-button" data-example="예쁜">예쁜</button>
-          <button type="button" class="ghost-button" data-example="늦다">늦다</button>
+          <button type="button" class="ghost-button" data-example="늙는다">늙는다</button>
         </div>
       </section>
 
@@ -28,8 +28,8 @@
         <h2 id="input-title">용언 입력</h2>
         <div class="field-grid">
           <label>
-            <span>판별할 용언 입력 (예: 먹다, 먹는다, 예쁘다, 예쁜, 굳는다, 굳은 등 모두 가능)</span>
-            <input id="wordInput" type="text" placeholder="단어나 활용형을 입력하세요" autocomplete="off" />
+            <span>판별할 용언 입력 (텍스트 그대로의 활용 어미를 추적합니다)</span>
+            <input id="wordInput" type="text" placeholder="예: 굳는다, 굳은, 예쁜, 먹다" autocomplete="off" />
           </label>
         </div>
         <div class="input-actions">
@@ -45,11 +45,11 @@
 
         <div class="result-grid">
           <article>
-            <h3>수행평가 5대 어미 활용형 교차 검증</h3>
+            <h3>수행평가 어미 형태소 형태 분석 결과</h3>
             <ol id="processList"></ol>
           </article>
           <article>
-            <h3>품사별 활용형 스코어</h3>
+            <h3>품사 형태 매칭 스코어</h3>
             <table>
               <thead>
                 <tr>
@@ -73,16 +73,16 @@
         </div>
         <div class="reference-grid">
           <article>
-            <h3>동사 수용 활용형 어미</h3>
-            <p>현재 선어말어미 ‘-는-’, 관형사형 어미 ‘-는’, 감탄형 어미 ‘-는구나’, 명령형 어미 ‘-어라/-아라’, 청유형 어미 ‘-자’가 매끄럽게 결합합니다.</p>
+            <h3>동사 형태적 특징</h3>
+            <p>어간에 현재 시제 선어말어미 ‘-는-/-ㄴ-’, 관형사형 어미 ‘-는’, 감탄형 어미 ‘-는구나’, 명령형 ‘-어라’, 청유형 ‘-자’가 직접 포착되거나 결합할 수 있습니다.</p>
           </article>
           <article>
-            <h3>형용사 수용 활용형 어미</h3>
-            <p>현재 관형사형 어미 ‘-(으)ㄴ’, 감탄형 어미 ‘-구나’와 결합하며, 현재 선어말어미나 명령형/청유형 어미와는 결합이 제한됩니다.</p>
+            <h3>형용사 형태적 특징</h3>
+            <p>현재 선어말어미나 명령/청유형이 나타나지 않으며, 현재 시제 표출 시 관형사형 어미 ‘-(으)ㄴ’, 감탄형 어미 ‘-구나’가 나타납니다.</p>
           </article>
           <article>
-            <h3>수행평가 출제 주의어</h3>
-            <p>있다/없다, 크다, 밝다, 늦다, 굳다 등은 문맥 속 활용 변형 구조에 따라 동사와 형용사의 양면성을 지니므로 명확한 활용 분석이 필수적입니다.</p>
+            <h3>수행평가 출제 유의 선지</h3>
+            <p>‘굳은 말버릇’의 ‘굳은’은 동사 ‘굳다’가 관형사형으로 활용된 것일 뿐 형용사가 아닙니다. 활용형 어미의 정체를 밝히는 것이 수행평가의 핵심입니다.</p>
           </article>
         </div>
       </section>
