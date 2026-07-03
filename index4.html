@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>동사/형용사 판별 도우미</title>
+    <link rel="stylesheet" href="style4.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">고등 학교문법 기준</p>
+          <h1>동사/형용사 판별 도우미</h1>
+          <p class="intro-copy">
+            판별할 용언(기본형)을 입력하면 학교문법 형태론 규칙에 따라 동사와 형용사를 자동으로 분석합니다.
+          </p>
+        </div>
+        <div class="quick-examples" aria-label="예시 입력">
+          <button type="button" class="ghost-button" data-example="먹다">먹다</button>
+          <button type="button" class="ghost-button" data-example="예쁘다">예쁘다</button>
+          <button type="button" class="ghost-button" data-example="크다">크다</button>
+        </div>
+      </section>
+
+      <section class="input-panel" aria-labelledby="input-title">
+        <h2 id="input-title">문제 입력</h2>
+        <div class="field-grid">
+          <label>
+            <span>판별할 용언 (기본형)</span>
+            <input id="wordInput" type="text" placeholder="예: 먹다, 예쁘다, 건강하다" autocomplete="off" />
+          </label>
+        </div>
+        <div class="input-actions">
+          <button id="buildButton" type="button" class="primary-button">판별 및 분석하기</button>
+          <button id="resetButton" type="button" class="secondary-button">초기화</button>
+        </div>
+      </section>
+
+      <section id="resultPanel" class="result-panel hidden" aria-live="polite">
+        <div id="resultBadge" class="result-badge">판정 유보</div>
+        <h2 id="resultTitle">결론</h2>
+        <p id="resultSummary" class="result-summary"></p>
+
+        <div class="result-grid">
+          <article>
+            <h3>판별 과정</h3>
+            <ol id="processList"></ol>
+          </article>
+          <article>
+            <h3>근거 요약</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>점수</th>
+                  <th>주요 근거</th>
+                </tr>
+              </thead>
+              <tbody id="evidenceTable"></tbody>
+            </table>
+          </article>
+        </div>
+
+        <article id="noticeBox" class="notice-box"></article>
+      </section>
+
+      <section class="reference-panel" aria-labelledby="reference-title">
+        <div class="section-heading">
+          <p class="eyebrow">기준 요약</p>
+          <h2 id="reference-title">학교문법 판별 기준</h2>
+        </div>
+        <div class="reference-grid">
+          <article>
+            <h3>동사 쪽 근거</h3>
+            <p>움직임이나 작용을 나타내고, 현재 평서형(-ㄴ다/-는다)·명령형·청유형이 자연스럽습니다.</p>
+          </article>
+          <article>
+            <h3>형용사 쪽 근거</h3>
+            <p>성질이나 상태를 나타내고, 일반적으로 명령형·청유형이 어렵습니다.</p>
+          </article>
+          <article>
+            <h3>주의</h3>
+            <p>있다/없다, 맛있다/재미있다, 크다 등은 문맥이나 특별한 활용 규정에 규제됩니다.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="app4.js"></script>
+  </body>
+</html>
